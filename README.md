@@ -1,5 +1,5 @@
 
-# lambda-layer-generator-python
+# python-lambda-layer-generator
 
 This project helps in generating an AWS Lambda layer with the required Python dependencies. The generated layer can be used to package and deploy Python dependencies for AWS Lambda functions.
 
