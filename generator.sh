@@ -1,0 +1,1 @@
+docker build --target export --output type=local,dest=./ .
