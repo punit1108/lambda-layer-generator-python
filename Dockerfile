@@ -14,9 +14,14 @@ RUN apt-get update && \
 RUN python3.12 -m pip install virtualenv && \
     python3.12 -m venv venv && \
     chmod +x ./venv/bin/activate && \
-    ./venv/bin/activate && \
-    pip install -r requirements.txt --platform manylinux2014_x86_64 --python-version 3.12 --only-binary=:all: --target ./venv/lib/python3.12/site-packages && \
-    mkdir python && \
+    . ./venv/bin/activate && \
+    pip install -r requirements.txt --platform manylinux2014_x86_64 --python-version 3.12 --only-binary=:all: --target ./venv/lib/python3.12/site-packages
+
+# Run the main.py script using the virtual environment's python
+RUN . ./venv/bin/activate && python script.py
+
+# Package the virtual environment
+RUN mkdir python && \
     cp -r venv/lib python/ && \
     zip -r layer_content.zip python
 
