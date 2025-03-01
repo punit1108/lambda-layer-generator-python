@@ -1,84 +1,99 @@
+# Python Lambda Layer Generator
 
-# python-lambda-layer-generator
+A tool to create AWS Lambda layers with Python dependencies using Docker. This project simplifies the process of packaging Python dependencies for AWS Lambda, ensuring compatibility with the Lambda runtime environment.
 
-This project helps in generating an AWS Lambda layer with the required Python dependencies. The generated layer can be used to package and deploy Python dependencies for AWS Lambda functions.
+## Overview
+
+AWS Lambda layers allow you to include additional code and content in your Lambda functions. This project automates the creation of Lambda layers for Python dependencies, ensuring they are compiled for the correct architecture and Python version.
 
 ## Prerequisites
 
-- Docker: Ensure Docker is installed and running on your machine.
-- AWS CLI: Ensure AWS CLI is installed and configured with appropriate permissions (optional for publishing the layer).
+- **Docker**: Required to build the Lambda layer in an environment similar to AWS Lambda
+- **AWS CLI** (optional): Required only if you want to publish the layer directly to AWS
 
-## Steps for Usage
+## Quick Start
 
-### 1. Populate `requirements.txt` with the Required Python Dependencies
+### 1. Define Your Dependencies
 
-Add the required Python dependencies to the `requirements.txt` file. For example:
+Edit `requirements.txt` to include the Python packages you want in your layer:
 
 ```plaintext
+# Example requirements.txt
 openai
 pydantic-core
+importlib-metadata
 ```
 
-### 2. Run `generator.sh`
+### 2. Generate the Layer
 
-This step builds the Docker image, creates a virtual environment, installs the dependencies, and packages them into a zip file.
+Run the generator script:
 
 ```bash
 ./generator.sh
 ```
 
-### 3. Run `publish.sh` (Optional Step)
+This will:
+- Build a Docker image with a Lambda-like environment
+- Install your Python dependencies
+- Package them into a ZIP file (`layer_content.zip`)
 
-This step publishes a new version of an AWS Lambda layer using the AWS CLI. Ensure the `layer_content.zip` file is present in the same directory as the script.
+### 3. Publish Your Layer (Optional)
+
+If you have AWS CLI configured, you can publish the layer directly:
 
 ```bash
-./publish.sh <layer-name>
+./publish.sh my-lambda-layer
 ```
 
-Replace `<layer-name>` with the name of the AWS Lambda layer you want to publish.
+Replace `my-lambda-layer` with your preferred layer name.
 
-## File Descriptions
+## Project Structure
 
-### `requirements.txt`
+- **Dockerfile**: Configures the Docker environment for building the layer
+- **requirements.txt**: Lists the Python dependencies to include in the layer
+- **script.py**: Optional script to run before packaging (useful for post-install tasks)
+- **generator.sh**: Script to build the Docker image and generate the layer
+- **publish.sh**: Script to publish the layer to AWS
 
-This file contains the list of Python dependencies required for the AWS Lambda layer.
+## Advanced Usage
 
-### `generator.sh`
+### Custom Scripts
 
-This script builds the Docker image and generates the `layer_content.zip` file containing the Python dependencies.
+You can modify `script.py` to perform custom tasks before the layer is packaged. This is useful for:
+- Downloading additional resources
+- Configuring packages that require post-install setup
+- Testing the installed packages
 
-### `publish.sh`
+### Examples
 
-This script publishes a new version of an AWS Lambda layer using the AWS CLI.
+Check the `examples/` directory for specific use cases:
+- `examples/nltk/`: How to create a layer with NLTK and download language data
 
-### `Dockerfile`
+## Troubleshooting
 
-The Dockerfile used to build the Docker image, create the virtual environment, install the dependencies, and package them into a zip file.
+### Common Issues
 
-## Example
+1. **Binary Compatibility**:
+   - If you see errors related to binary compatibility, ensure you're using the `--platform manylinux2014_x86_64` flag in the Dockerfile
 
-1. Populate `requirements.txt`:
+2. **Missing Dependencies**:
+   - Some packages require system libraries. You may need to modify the Dockerfile to install them
 
-    ```plaintext
-    openai
-    pydantic-core
-    ```
+3. **Layer Size Limits**:
+   - AWS Lambda layers have a size limit of 250 MB (unzipped). Monitor your layer size
 
-2. Run `generator.sh`:
+## Architecture
 
-    ```bash
-    ./generator.sh
-    ```
+This project uses a multi-stage Docker build process:
+1. **Builder Stage**: Installs dependencies and packages them
+2. **Export Stage**: Copies the generated ZIP file to your local system
 
-3. Run `publish.sh` (optional):
+The Docker image uses the `amazon/aws-lambda-python` base image to ensure compatibility with the actual Lambda runtime environment.
 
-    ```bash
-    ./publish.sh my-layer
-    ```
+## Contributing
 
-This will create and publish an AWS Lambda layer named `my-layer` with the specified Python dependencies.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Notes
+## License
 
-- Ensure Docker is installed and running before executing `generator.sh`.
-- Ensure AWS CLI is installed and configured with appropriate permissions before executing `publish.sh`.
+This project is licensed under the MIT License - see the LICENSE file for details.
