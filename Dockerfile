@@ -21,7 +21,7 @@ RUN python3.12 -m pip install virtualenv && \
 RUN . ./venv/bin/activate && python script.py
 
 # Package the virtual environment
-RUN mkdir python && \
+RUN mkdir -p python && \
     cp -r venv/lib python/ && \
     zip -r layer_content.zip python
 
