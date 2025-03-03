@@ -30,6 +30,8 @@ RUN mkdir -p python && \
     cp -r venv/lib python/ && \
     zip -r layer_content.zip python
 
+RUN rm -rf venv
+
 # Stage 2: Export the venv folder to the host
 FROM scratch AS export
 COPY --from=builder /shared_space/layer_content.zip /layer_content.zip
